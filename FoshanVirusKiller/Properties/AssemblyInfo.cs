@@ -1,18 +1,16 @@
 ﻿using System.Reflection;
-using System.Resources;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows;
 
 // 有关程序集的一般信息由以下
 // 控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("Killer")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("FoshanVirusKiller")]
+[assembly: AssemblyDescription("佛山现场[rundll32.exe]蠕虫病毒专杀程序.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Killer")]
-[assembly: AssemblyCopyright("Copyright ©  2017")]
+[assembly: AssemblyCompany("Hanm")]
+[assembly: AssemblyProduct("FoshanVirusKiller")]
+[assembly: AssemblyCopyright("Copyright ©  2017 Himmelt")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -53,3 +51,5 @@ using System.Windows;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: Guid("BF12D8E8-9EDD-4299-BF8A-6F7A49499A2D")]
+
