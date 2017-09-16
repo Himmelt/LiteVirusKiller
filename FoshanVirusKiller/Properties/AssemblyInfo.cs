@@ -10,7 +10,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Hanm")]
 [assembly: AssemblyProduct("FoshanVirusKiller")]
-[assembly: AssemblyCopyright("Copyright ©  2017 Himmelt")]
+[assembly: AssemblyCopyright("Copyright (c)  2017 Himmelt")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

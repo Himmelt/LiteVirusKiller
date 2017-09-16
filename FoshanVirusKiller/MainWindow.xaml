@@ -14,7 +14,7 @@
         <Grid.Background>
             <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
         </Grid.Background>
-        <Button x:Name="btn_kill" Content="一 键 杀 毒" HorizontalAlignment="Center" Margin="0,20,0,30" Width="160" VerticalAlignment="Bottom" Height="40" Grid.Row="1" FontSize="16" Click="OneKeyKill" FontFamily="/FoshanVirusKiller;component/Resources/#Hiragino Sans GB W3"/>
-        <TextBox x:Name="text_log" Margin="40,40,40,10" Text="[rundll32.exe] 蠕虫病毒专杀程序使用说明:&#xD;&#xA;1. 本程序免费&amp;开源,所以不提供任何保证. 不保证一定能杀毒,也不保证误杀.&#xD;&#xA;2. 本程序需要.NetFramework 4.0 及以上. 没有的自行安装.&#xD;&#xA;3. 如要查杀并恢复U盘,请将本程序放在U盘根目录下,双击运行.&#xD;&#xA;4. xxxxx" HorizontalScrollBarVisibility="Auto" AcceptsReturn="True" AcceptsTab="True" IsUndoEnabled="False" FontSize="18" FontFamily="/FoshanVirusKiller;component/Resources/#Hiragino Sans GB W3"/>
+        <Button x:Name="btn_kill" Content="K" HorizontalAlignment="Center" Margin="0,20,0,30" Width="160" VerticalAlignment="Bottom" Height="40" Grid.Row="1" FontSize="16" Click="OneKeyKill" FontFamily="/FoshanVirusKiller;component/Resources/#Hiragino Sans GB W3"/>
+        <TextBox x:Name="text_log" Margin="40,40,40,10" Text="[rundll32.exe]" HorizontalScrollBarVisibility="Auto" AcceptsReturn="True" AcceptsTab="True" IsUndoEnabled="False" FontFamily="/FoshanVirusKiller;component/Resources/#Hiragino Sans GB W3" VerticalScrollBarVisibility="Auto"/>
     </Grid>
 </Window>

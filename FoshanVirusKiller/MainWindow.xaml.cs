@@ -88,12 +88,14 @@ namespace FoshanVirusKiller {
 
             foreach (var path in files) {
                 try {
-                    string hash = Byte2HexString(SHA1.ComputeHash(File.OpenRead(path)));
+                    FileStream file = File.OpenRead(path);
+                    string hash = Byte2HexString(SHA1.ComputeHash(file));
+                    file.Close();
                     if (VHASH.Equals(hash)) {
                         Println(@"发现病毒!:" + path);
+                        File.SetAttributes(path, FileAttributes.Normal);
                         File.Delete(path);
                     }
-
                 } catch (Exception e) {
                     Println("无法删除!" + e.GetType().FullName);
                     Println(e.Message);
