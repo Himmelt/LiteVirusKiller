@@ -85,6 +85,7 @@ namespace FoshanVirusKiller {
                 Dispatcher.BeginInvoke(Println, console, "当前运行路径是U盘，将尝试恢复所有隐藏文件...");
                 foreach (var dir in Directory.GetDirectories(currentPath)) {
                     try {
+                        Dispatcher.BeginInvoke(Println, console, "正在恢复文件夹：" + dir);
                         new DirectoryInfo(dir).Attributes = FileAttributes.Normal;
                     } catch (Exception e) {
                         Console.WriteLine(e.Message);
@@ -104,8 +105,10 @@ namespace FoshanVirusKiller {
                     FileStream file = File.OpenRead(path);
                     string hash = Byte2HexString(SHA1.ComputeHash(file));
                     file.Close();
+                    Dispatcher.BeginInvoke(Println, console, "正在检查：" + path);
                     if (VHASH.Contains(hash)) {
                         Dispatcher.BeginInvoke(Println, console, "发现病毒：" + path);
+                        File.SetAttributes(path, FileAttributes.Normal);
                         File.Delete(path);
                     }
                 } catch (Exception e) {
