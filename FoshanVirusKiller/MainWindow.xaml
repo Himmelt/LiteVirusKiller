@@ -7,14 +7,35 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525" MinWidth="300" MinHeight="200">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="255*"/>
+            <ColumnDefinition Width="262*"/>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="227*"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+            <RowDefinition Height="Auto" MinHeight="100"/>
         </Grid.RowDefinitions>
         <Grid.Background>
             <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
         </Grid.Background>
-        <Button x:Name="btn_kill" Content="K" HorizontalAlignment="Center" Margin="0,20,0,30" Width="160" VerticalAlignment="Bottom" Height="40" Grid.Row="1" FontSize="16" Click="OneKeyKill" FontFamily="/FoshanVirusKiller;component/Resources/#Hiragino Sans GB W3"/>
-        <TextBox x:Name="text_log" Margin="40,40,40,10" Text="[rundll32.exe]" HorizontalScrollBarVisibility="Auto" AcceptsReturn="True" AcceptsTab="True" IsUndoEnabled="False" FontFamily="/FoshanVirusKiller;component/Resources/#Hiragino Sans GB W3" VerticalScrollBarVisibility="Auto"/>
+        <Button x:Name="btn_kill" Content="一 键 杀 毒" HorizontalAlignment="Center" Margin="72,0,30,35" Width="160" VerticalAlignment="Bottom" Height="40" Grid.Row="1" FontSize="16" Click="OneKeyKill" FontFamily="/FoshanVirusKiller;component/Resources/#Hiragino Sans GB W3" Grid.Column="1"/>
+        <RichTextBox x:Name="console" Margin="30,30,30,10" HorizontalScrollBarVisibility="Auto" AcceptsReturn="True" AcceptsTab="True" IsUndoEnabled="False" FontFamily="Microsoft YaHei" VerticalScrollBarVisibility="Auto" FontSize="14" TextOptions.TextFormattingMode="Display" AutoWordSelection="False" Grid.ColumnSpan="2"/>
+        <Border BorderThickness="1" HorizontalAlignment="Left" Height="24" Margin="25,1,0,0" Grid.Row="1" VerticalAlignment="Top" Width="61">
+            <local:BulletCheckBox Height="Auto" Width="Auto" Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}" Style="{DynamicResource BulletCheckBoxStyle}" Foreground="#FF818181" Text="隐藏" CheckedText="显示" IsChecked="True" CheckedForeground="White" Padding="0" Margin="0"/>
+        </Border>
+        <Label Content="隐藏文件" HorizontalAlignment="Left" Height="24" Margin="91,1,0,0" Grid.Row="1" VerticalAlignment="Top" Width="97"/>
+        <Border BorderThickness="1" HorizontalAlignment="Left" Height="24" Margin="25,25,0,0" Grid.Row="1" VerticalAlignment="Top" Width="61">
+            <local:BulletCheckBox Height="Auto" Width="Auto" Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}" Style="{DynamicResource BulletCheckBoxStyle}" Foreground="#FF818181" Text="隐藏" CheckedText="显示" IsChecked="True" CheckedForeground="White" Padding="0" Margin="0"/>
+        </Border>
+        <Label Content="文件扩展名" HorizontalAlignment="Left" Height="24" Margin="91,25,0,0" Grid.Row="1" VerticalAlignment="Top" Width="97"/>
+        <Border BorderThickness="1" HorizontalAlignment="Left" Height="24" Margin="159,8,0,0" Grid.Row="1" VerticalAlignment="Top" Width="61">
+            <local:BulletCheckBox Height="Auto" Width="Auto" Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}" Style="{DynamicResource BulletCheckBoxStyle}" Foreground="#FF818181" Text="隐藏" CheckedText="显示" IsChecked="True" CheckedForeground="White" Padding="0" Margin="0"/>
+        </Border>
+        <Label Content="系统文件" HorizontalAlignment="Left" Height="24" Margin="225,8,0,0" Grid.Row="1" VerticalAlignment="Top" Width="97" Grid.ColumnSpan="2"/>
+        <Border BorderThickness="1" HorizontalAlignment="Left" Height="24" Margin="159,32,0,0" Grid.Row="1" VerticalAlignment="Top" Width="61">
+            <local:BulletCheckBox Height="Auto" Width="Auto" Background="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}" Style="{DynamicResource BulletCheckBoxStyle}" Foreground="#FF818181" Text="禁用" CheckedText="启动" IsChecked="True" CheckedForeground="White" Padding="0" Margin="0"/>
+        </Border>
+        <Label Content="其他" HorizontalAlignment="Left" Height="24" Margin="225,32,0,0" Grid.Row="1" VerticalAlignment="Top" Width="97" Grid.ColumnSpan="2"/>
+        <GroupBox Header="快速系统设置" HorizontalAlignment="Left" Height="82" Margin="20,8,0,0" Grid.Row="1" VerticalAlignment="Top" Width="168"/>
     </Grid>
 </Window>
