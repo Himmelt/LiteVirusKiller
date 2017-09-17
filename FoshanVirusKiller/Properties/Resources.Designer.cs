@@ -69,16 +69,5 @@ namespace FoshanVirusKiller.Properties {
                 return ((System.Drawing.Icon)(obj));
             }
         }
-        
-        /// <summary>
-        ///   查找类似 {\rtf1\adeflang1025\ansi\ansicpg936\uc2\adeff41\deff0\stshfdbch31505\stshfloch31506\stshfhich31506\stshfbi31507\deflang1033\deflangfe2052\themelang1033\themelangfe2052\themelangcs0{\fonttbl{\f0\fbidi \froman\fcharset0\fprq2{\*\panose 02020603050405020304}Times New Roman;}
-        ///{\f41\fbidi \fswiss\fcharset134\fprq2{\*\panose 00000000000000000000}Microsoft YaHei UI;}{\f44\fbidi \fswiss\fcharset134\fprq2{\*\panose 00000000000000000000}@Microsoft YaHei UI;}
-        ///{\flomajor\f31500\fbidi \froman\fcharset0\fprq2{\*\panose [字符串的其余部分被截断]&quot;; 的本地化字符串。
-        /// </summary>
-        internal static string readme {
-            get {
-                return ResourceManager.GetString("readme", resourceCulture);
-            }
-        }
     }
 }

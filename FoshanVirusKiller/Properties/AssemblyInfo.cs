@@ -1,17 +1,19 @@
 ﻿using System.Reflection;
+using System.Resources;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows;
 
 // 有关程序集的一般信息由以下
 // 控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("FoshanVirusKiller")]
-[assembly: AssemblyDescription("佛山现场[rundll32.exe]蠕虫病毒专杀程序.")]
+[assembly: AssemblyTitle("【rundll32.exe】蠕虫病毒专杀程序.")]
+[assembly: AssemblyDescription("【rundll32.exe】蠕虫病毒专杀程序.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Hanm")]
 [assembly: AssemblyProduct("FoshanVirusKiller")]
-[assembly: AssemblyCopyright("Copyright (c)  2017 Himmelt")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCopyright("Copyright ©  2017 Himmelt")]
+[assembly: AssemblyTrademark("Himmelt")]
 [assembly: AssemblyCulture("")]
 
 // 将 ComVisible 设置为 false 会使此程序集中的类型
@@ -49,7 +51,7 @@ using System.Windows;
 // 可以指定所有值，也可以使用以下所示的 "*" 预置版本号和修订号
 // 方法是按如下所示使用“*”: :
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("1.0.1.0")]
+[assembly: AssemblyFileVersion("1.0.1.0")]
 [assembly: Guid("BF12D8E8-9EDD-4299-BF8A-6F7A49499A2D")]
 
