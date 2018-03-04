@@ -10,11 +10,10 @@
             <RowDefinition Height="251*"/>
             <RowDefinition Height="110*" MinHeight="110" MaxHeight="110"/>
         </Grid.RowDefinitions>
-        <TextBox x:Name="console" Margin="30,20,30.333,9.667" AcceptsReturn="True" TextOptions.TextFormattingMode="Display" ClipToBounds="True" Padding="5" Foreground="#FFB85300" FontFamily="Microsoft YaHei" FontSize="14" HorizontalScrollBarVisibility="Auto"/>
-        <Button x:Name="killer" Content="快 速 查 杀" HorizontalAlignment="Right" Height="50" Margin="0,0,239.333,11.667" VerticalAlignment="Bottom" Width="140" Click="OneKeyKill" Grid.Row="1" FontFamily="Microsoft YaHei" FontSize="16" Foreground="#FF0080FF"/>
+        <TextBox x:Name="console" Margin="30,20,30.333,9.667" AcceptsReturn="True" TextOptions.TextFormattingMode="Display" ClipToBounds="True" Padding="5" Foreground="#FFB85300" FontFamily="Microsoft YaHei" FontSize="14" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"/>
+        <Button x:Name="killer" Content="快 速 查 杀" HorizontalAlignment="Center" Height="50" Margin="0,0,0,32" VerticalAlignment="Bottom" Width="140" Click="OneKeyKill" Grid.Row="1" FontFamily="Microsoft YaHei" FontSize="16" Foreground="#FF0080FF"/>
         <TextBlock HorizontalAlignment="Right" Height="20" Margin="0,0,10.333,9.667" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Bottom" TextAlignment="Center" Width="{Binding ActualWidth, ElementName=killer, Mode=OneWay}">
             <Hyperlink Click="OpenHyperlink" NavigateUri="https://github.com/Himmelt/FoshanVirusKiller" ToolTip="前往项目主页">查看项目主页及更新</Hyperlink>
         </TextBlock>
-        <ProgressBar Height="16" Margin="30,0,30.333,83.667" VerticalAlignment="Bottom" Value="36.8" Grid.Row="1"/>
     </Grid>
 </Window>

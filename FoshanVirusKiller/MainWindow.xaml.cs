@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Security.Cryptography;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -23,14 +22,16 @@ namespace FoshanVirusKiller
             237568,  // DeviceConfigManager
             469,     // DeviceConfigManager.vbs
             100,     // autorun.inf
-            347,     // disk.lnk
+            //347,     // disk.lnk
+            480768,  // svhost.exe
             32768
         };
         private static List<string> VHASH = new List<string>{
             "F0-EA-23-8D-9C-6C-C8-67-F1-6C-26-48-8F-D2-2E-FC-40-00-71-D0",// DeviceConfigManager.exe
             "C7-AD-86-7B-3B-79-E0-20-0C-72-5D-E9-83-DA-79-89-CE-BC-50-E5",// DeviceConfigManager.vbs
             "82-20-57-F5-57-CD-E0-DB-19-BC-22-06-71-54-1B-91-65-83-A1-E8",// autorun.inf
-            "89-B4-3C-C9-B0-D9-93-3C-4E-F7-50-BC-6D-E7-F7-28-8A-8F-7F-45",// disk.lnk
+            //"89-B4-3C-C9-B0-D9-93-3C-4E-F7-50-BC-6D-E7-F7-28-8A-8F-7F-45",// disk.lnk
+            "ED-02-7B-13-7F-D7-31-04-B3-AD-DD-EF-9E-46-13-0F-03-FB-B6-36",// svhost.exe
             "06-29-3D-EA-80-E3-9C-7E-B7-EE-2B-DB-00-D6-0B-58-D9-32-FA-8A" // rundll32.exe
         };
 
@@ -91,7 +92,7 @@ namespace FoshanVirusKiller
             KillProcess();
 
             // 检查可移动磁盘
-            KillUSBDisk();
+            KillDisks();
 
             Task.WaitAll(TASKS.ToArray());
 
@@ -138,25 +139,28 @@ namespace FoshanVirusKiller
             }
         }
 
-        private void KillUSBDisk()
+        private void KillDisks()
         {
             foreach (DriveInfo info in DriveInfo.GetDrives())
             {
                 if (info.DriveType == DriveType.Removable)
                 {
-                    KillDirectory(info.RootDirectory);
+                    Dispatcher.BeginInvoke(Println, console, "正在检查可移动磁盘：" + info.VolumeLabel);
+                    KillDirectory(info.RootDirectory, true);
                 }
             }
+            Dispatcher.BeginInvoke(Println, console, "正在检查用户文件夹，文件数量巨大，请耐心等待！");
+            KillDirectory(new DirectoryInfo(@"C:\Users\"), false);
         }
 
-        private void KillDirectory(DirectoryInfo directory)
+        private void KillDirectory(DirectoryInfo directory, bool usb)
         {
             foreach (var dir in directory.GetDirectories())
             {
                 try
                 {
                     dir.Attributes = FileAttributes.Normal;
-                    KillDirectory(dir);
+                    KillDirectory(dir, usb);
                 }
                 catch (Exception)
                 {
@@ -169,7 +173,10 @@ namespace FoshanVirusKiller
                 try
                 {
                     file.Attributes = FileAttributes.Normal;
-                    TryKillVirus(file);
+                    if (usb && file.Extension.Contains("lnk"))
+                        DeleteFile(file, true);
+                    else
+                        TryKillVirus(file);
                 }
                 catch (Exception)
                 {
