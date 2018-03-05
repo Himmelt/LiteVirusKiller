@@ -10,7 +10,7 @@ using System.Windows;
 [assembly: AssemblyTitle("FoshanVirusKiller")]
 [assembly: AssemblyDescription("FoshanVirusKiller")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Hanm")]
+[assembly: AssemblyCompany("SoraWorld")]
 [assembly: AssemblyProduct("FoshanVirusKiller")]
 [assembly: AssemblyCopyright("Copyright ©  2017-2018 Himmelt")]
 [assembly: AssemblyTrademark("Himmelt")]
@@ -51,7 +51,7 @@ using System.Windows;
 // 可以指定所有值，也可以使用以下所示的 "*" 预置版本号和修订号
 // 方法是按如下所示使用“*”: :
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.1.0.0")]
-[assembly: AssemblyFileVersion("1.1.0.0")]
+[assembly: AssemblyVersion("1.2.0.0")]
+[assembly: AssemblyFileVersion("1.2.0.0")]
 [assembly: Guid("BF12D8E8-9EDD-4299-BF8A-6F7A49499A2D")]
 

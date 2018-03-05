@@ -16,6 +16,8 @@ namespace FoshanVirusKiller
     /// </summary>
     public partial class MainWindow : Window
     {
+        private static long count = 0;
+        private static bool entire = false;
 
         private static string KEYFOLDER = @"Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced";
         private static List<long> SIZES = new List<long> {
@@ -25,6 +27,7 @@ namespace FoshanVirusKiller
             //347,     // disk.lnk
             480768,  // svhost.exe
             376832,  // fold.exe
+            680511, //rundll32.exe
             32768
         };
         private static List<string> VHASH = new List<string>{
@@ -51,7 +54,15 @@ namespace FoshanVirusKiller
             textBox.AppendText(text + "\n");
             textBox.ScrollToEnd();
         });
-        private static Action<Button, bool> EnableButton = new Action<Button, bool>((button, enable) => button.IsEnabled = enable);
+        private static Action<TextBlock, string> ShowStatus = new Action<TextBlock, string>((status, text) =>
+        {
+            status.Text = "正在检查：" + text;
+        });
+        private static Action<TextBlock> ClearStatus = new Action<TextBlock>((status) =>
+        {
+            status.Text = "";
+        });
+        private static Action<Control, bool> EnableControl = new Action<Control, bool>((control, enable) => control.IsEnabled = enable);
 
         private void DeleteFile(FileInfo target, bool top)
         {
@@ -85,8 +96,11 @@ namespace FoshanVirusKiller
         private void KillTask()
         {
             // 初始化启动
+            count = 0;
             TASKS.Clear();
-            Dispatcher.BeginInvoke(EnableButton, killer, false);
+            Dispatcher.BeginInvoke(EnableControl, killer, false);
+            Dispatcher.BeginInvoke(EnableControl, checkQuick, false);
+            Dispatcher.BeginInvoke(EnableControl, checkEntire, false);
             Dispatcher.BeginInvoke(ClearText, console);
 
             // 检查系统进程
@@ -99,8 +113,11 @@ namespace FoshanVirusKiller
             Task.WaitAll(TASKS.ToArray());
 
             // 查杀完毕
+            Dispatcher.BeginInvoke(ClearStatus, status);
             Dispatcher.BeginInvoke(Println, console, "查杀完毕！");
-            Dispatcher.BeginInvoke(EnableButton, killer, true);
+            Dispatcher.BeginInvoke(EnableControl, killer, true);
+            Dispatcher.BeginInvoke(EnableControl, checkQuick, true);
+            Dispatcher.BeginInvoke(EnableControl, checkEntire, true);
         }
 
         private void KillProcess()
@@ -111,7 +128,7 @@ namespace FoshanVirusKiller
                 try
                 {
                     FileInfo info = new FileInfo(process.MainModule.FileName);
-                    //Dispatcher.BeginInvoke(Println, console, "正在检查进程：" + info.Name);
+                    Dispatcher.BeginInvoke(ShowStatus, status, info.FullName);
                     if (info.Exists && SIZES.Contains(info.Length))
                     {
                         FileStream file = info.Open(FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
@@ -143,26 +160,30 @@ namespace FoshanVirusKiller
 
         private void KillDisks()
         {
+            if (entire) Dispatcher.BeginInvoke(Println, console, "正在全盘检查，文件数量巨大，请耐心等待！");
             foreach (DriveInfo info in DriveInfo.GetDrives())
             {
-                if (info.DriveType == DriveType.Removable)
+                if (entire || info.DriveType == DriveType.Removable)
                 {
-                    Dispatcher.BeginInvoke(Println, console, "正在检查可移动磁盘：" + info.VolumeLabel);
-                    KillDirectory(info.RootDirectory, true);
+                    Dispatcher.BeginInvoke(Println, console, "正在检查磁盘：" + info.VolumeLabel);
+                    CheckDirectory(info.RootDirectory, info.DriveType == DriveType.Removable);
                 }
             }
-            Dispatcher.BeginInvoke(Println, console, "正在检查用户文件夹，文件数量巨大，请耐心等待！");
-            KillDirectory(new DirectoryInfo(@"C:\Users\"), false);
+            if (!entire)
+            {
+                Dispatcher.BeginInvoke(Println, console, "正在检查用户文件夹，文件数量较大，请耐心等待！");
+                CheckDirectory(new DirectoryInfo(@"C:\Users\"), false);
+            }
         }
 
-        private void KillDirectory(DirectoryInfo directory, bool usb)
+        private void CheckDirectory(DirectoryInfo directory, bool usb)
         {
             foreach (var dir in directory.GetDirectories())
             {
                 try
                 {
-                    dir.Attributes = FileAttributes.Normal;
-                    KillDirectory(dir, usb);
+                    if (usb) dir.Attributes = FileAttributes.Normal;
+                    CheckDirectory(dir, usb);
                 }
                 catch (Exception)
                 {
@@ -172,9 +193,14 @@ namespace FoshanVirusKiller
             }
             foreach (var file in directory.GetFiles())
             {
+                if (count++ > 100)
+                {
+                    Dispatcher.BeginInvoke(ShowStatus, status, file.FullName);
+                    count = 0;
+                }
                 try
                 {
-                    file.Attributes = FileAttributes.Normal;
+                    if (usb) file.Attributes = FileAttributes.Normal;
                     if (usb && file.Extension.Contains("lnk"))
                         DeleteFile(file, true);
                     else
@@ -241,5 +267,16 @@ namespace FoshanVirusKiller
             Process.Start(new ProcessStartInfo(link.NavigateUri.AbsoluteUri));
         }
 
+        private void OnQuickChecked(object sender, RoutedEventArgs e)
+        {
+            entire = false;
+            killer.Content = "快 速 查 杀";
+        }
+
+        private void OnEntireChecked(object sender, RoutedEventArgs e)
+        {
+            entire = true;
+            killer.Content = "全 盘 查 杀";
+        }
     }
 }
