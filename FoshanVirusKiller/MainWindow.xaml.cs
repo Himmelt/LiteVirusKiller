@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using Microsoft.VisualBasic.FileIO;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -83,7 +84,10 @@ namespace FoshanVirusKiller
                 {
                     DeleteFile(target, false);
                 }
-                if (top) Dispatcher.BeginInvoke(Println, console, "已删除病毒文件：" + target.FullName);
+                if (top)
+                {
+                    Dispatcher.BeginInvoke(Println, console, "已删除病毒文件：" + target.FullName);
+                }
             });
             TASKS.Add(task);
         }
@@ -206,11 +210,18 @@ namespace FoshanVirusKiller
                 }
                 try
                 {
-                    if (usb) file.Attributes = FileAttributes.Normal;
-                    if (usb && file.Extension.Contains("lnk"))
-                        DeleteFile(file, true);
+                    if (usb)
+                    {
+                        file.Attributes = FileAttributes.Normal;
+                        if (file.Extension.Contains("lnk") || file.Name.Contains("autorun.inf") || file.Name.Contains("DeviceConfigManager.vbs"))
+                        {
+                            DeleteFile(file, true);
+                        }
+                    }
                     else
+                    {
                         TryKillVirus(file);
+                    }
                 }
                 catch (Exception)
                 {
