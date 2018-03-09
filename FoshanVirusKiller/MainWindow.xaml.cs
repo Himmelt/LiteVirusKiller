@@ -16,7 +16,7 @@ namespace FoshanVirusKiller
     /// </summary>
     public partial class MainWindow : Window
     {
-        private static long count = 0;
+        private static DateTime last = DateTime.Now;
         private static bool entire = false;
         private static string KEYFOLDER = @"Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced";
         private static List<long> SIZES = new List<long> {
@@ -92,7 +92,7 @@ namespace FoshanVirusKiller
         private void KillTask()
         {
             // 初始化启动
-            count = 0;
+            last = DateTime.Now;
             TASKS.Clear();
             Dispatcher.BeginInvoke(EnableControl, killer, false);
             Dispatcher.BeginInvoke(EnableControl, checkQuick, false);
@@ -100,7 +100,7 @@ namespace FoshanVirusKiller
             Dispatcher.BeginInvoke(ClearText, console);
 
             // 检查系统进程
-            Dispatcher.BeginInvoke(Println, console, "正在检查系统进程...");
+            Dispatcher.BeginInvoke(Println, console, "正在检查系统进程 . . .");
             KillProcess();
 
             // 检查可移动磁盘
@@ -161,7 +161,7 @@ namespace FoshanVirusKiller
             {
                 if (entire || info.DriveType == DriveType.Removable)
                 {
-                    Dispatcher.BeginInvoke(Println, console, "正在检查磁盘：" + info.VolumeLabel);
+                    Dispatcher.BeginInvoke(Println, console, "正在检查磁盘：" + info.VolumeLabel + " ( " + info.ToString() + " ) ");
                     CheckDirectory(info.RootDirectory, info.DriveType == DriveType.Removable);
                 }
             }
@@ -189,10 +189,11 @@ namespace FoshanVirusKiller
             }
             foreach (var file in directory.GetFiles())
             {
-                if (count++ > 100)
+
+                if ((DateTime.Now - last).TotalMilliseconds > 25)
                 {
                     Dispatcher.BeginInvoke(ShowStatus, status, file.FullName);
-                    count = 0;
+                    last = DateTime.Now;
                 }
                 try
                 {
@@ -204,10 +205,7 @@ namespace FoshanVirusKiller
                             DeleteFile(file, true);
                         }
                     }
-                    else
-                    {
-                        TryKillVirus(file);
-                    }
+                    TryKillVirus(file);
                 }
                 catch (Exception)
                 {
