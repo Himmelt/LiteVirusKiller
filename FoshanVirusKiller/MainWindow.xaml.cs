@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Collections.Concurrent;
+using System.Reflection;
 
 namespace FoshanVirusKiller
 {
@@ -89,6 +90,10 @@ namespace FoshanVirusKiller
         {
             InitializeComponent();
             ShowExtension();
+
+            var versionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location);
+            versionLabel.Content = versionInfo.ProductVersion;
+            copyrightLabel.Content = versionInfo.LegalCopyright;
         }
 
         private void OneKeyKill(object sender, RoutedEventArgs e)

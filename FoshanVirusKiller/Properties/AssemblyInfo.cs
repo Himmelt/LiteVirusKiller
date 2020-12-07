@@ -12,7 +12,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("SoraWorld")]
 [assembly: AssemblyProduct("FoshanVirusKiller")]
-[assembly: AssemblyCopyright("Copyright ©  2017-2021 Himmelt, All Rights Reserved.")]
+[assembly: AssemblyCopyright("Copyright © 2017-2021 Himmelt, All Rights Reserved.")]
 [assembly: AssemblyTrademark("Himmelt")]
 [assembly: AssemblyCulture("")]
 
