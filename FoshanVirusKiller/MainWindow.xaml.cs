@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Collections.Concurrent;
 
 namespace FoshanVirusKiller
 {
@@ -25,16 +26,22 @@ namespace FoshanVirusKiller
             480768, // svhost.exe
             376832, // fold.exe
             680511, // rundll32.exe
-            32768   // 感染型木马_system~.ini
+            32768,  // 感染型木马_system~.ini
+            684607, // folder.exe
+            688703, // folder.exe
+            253952, // sysmwef.exe
         };
         private static List<string> VHASH = new List<string>{
             "E6-DB-74-2A-81-9E-B5-CC-87-4A-80-6E-AF-A0-EF-06-DB-A7-02-12",// winmgr.exe
             "F0-EA-23-8D-9C-6C-C8-67-F1-6C-26-48-8F-D2-2E-FC-40-00-71-D0",// DeviceConfigManager.exe
             "ED-02-7B-13-7F-D7-31-04-B3-AD-DD-EF-9E-46-13-0F-03-FB-B6-36",// svhost.exe
-            "1F-6F-E8-49-39-DA-40-51-CE-47-B8-11-30-82-36-65-29-8A-2B-60",// fold.exe
-            "06-29-3D-EA-80-E3-9C-7E-B7-EE-2B-DB-00-D6-0B-58-D9-32-FA-8A" // rundll32.exe
+            "1F-6F-E8-49-39-DA-40-51-CE-47-B8-11-30-82-36-65-29-8A-2B-60",// folder.exe
+            "06-29-3D-EA-80-E3-9C-7E-B7-EE-2B-DB-00-D6-0B-58-D9-32-FA-8A",// rundll32.exe
+            "87-D6-FE-33-4D-34-BC-59-A7-FD-C3-92-64-A5-FA-2B-3D-E5-FF-18",// folder.exe
+            "63-40-6D-FB-43-B3-47-88-D5-F3-63-69-92-25-1F-A6-EB-FD-96-B8",// folder.exe
+            "28-95-F4-B3-F3-A2-89-BF-34-40-A5-68-B2-D4-02-19-F7-C9-77-26",// sysmwef.exe
         };
-        private static List<Task> TASKS = new List<Task>();
+        private static ConcurrentBag<Task> TASKS = new ConcurrentBag<Task>();
         private static SHA1CryptoServiceProvider SHA1 = new SHA1CryptoServiceProvider();
         private static Action<TextBox> ClearText = new Action<TextBox>((textBox) => textBox.Clear());
         private static Action<TextBox, string> Print = new Action<TextBox, string>((textBox, text) =>
@@ -93,7 +100,8 @@ namespace FoshanVirusKiller
         {
             // 初始化启动
             last = DateTime.Now;
-            TASKS.Clear();
+            TASKS = new ConcurrentBag<Task>();
+
             Dispatcher.BeginInvoke(EnableControl, killer, false);
             Dispatcher.BeginInvoke(EnableControl, checkQuick, false);
             Dispatcher.BeginInvoke(EnableControl, checkEntire, false);
@@ -103,10 +111,11 @@ namespace FoshanVirusKiller
             Dispatcher.BeginInvoke(Println, console, "正在检查系统进程 . . .");
             KillProcess();
 
-            // 检查可移动磁盘
+            // 检查磁盘
             KillDisks();
 
             Task.WaitAll(TASKS.ToArray());
+
 
             // 查杀完毕
             Dispatcher.BeginInvoke(ClearStatus, status);
@@ -114,6 +123,7 @@ namespace FoshanVirusKiller
             Dispatcher.BeginInvoke(EnableControl, killer, true);
             Dispatcher.BeginInvoke(EnableControl, checkQuick, true);
             Dispatcher.BeginInvoke(EnableControl, checkEntire, true);
+            //Dispatcher.BeginInvoke(ClearStatus, status);
         }
 
         private void KillProcess()
@@ -157,19 +167,27 @@ namespace FoshanVirusKiller
         private void KillDisks()
         {
             if (entire) Dispatcher.BeginInvoke(Println, console, "正在全盘检查，文件数量巨大，请耐心等待！");
+            List<Task> tasks = new List<Task>();
             foreach (DriveInfo info in DriveInfo.GetDrives())
             {
                 if (entire || info.DriveType == DriveType.Removable)
                 {
-                    Dispatcher.BeginInvoke(Println, console, "正在检查磁盘：" + info.VolumeLabel + " ( " + info.ToString() + " ) ");
-                    CheckDirectory(info.RootDirectory, info.DriveType == DriveType.Removable);
+                    Task task = Task.Factory.StartNew(() =>
+                    {
+                        Dispatcher.BeginInvoke(Println, console, "正在检查磁盘：" + info.VolumeLabel + " ( " + info.ToString() + " ) ");
+                        CheckDirectory(info.RootDirectory, info.DriveType == DriveType.Removable);
+                        Dispatcher.BeginInvoke(Println, console, "磁盘：" + info.VolumeLabel + " ( " + info.ToString() + " ) 检查完毕！");
+                    });
+                    tasks.Add(task);
                 }
             }
             if (!entire)
             {
                 Dispatcher.BeginInvoke(Println, console, "正在检查用户文件夹，文件数量较大，请耐心等待！");
-                CheckDirectory(new DirectoryInfo(@"C:\Users\"), false);
+                Task task = Task.Factory.StartNew(() => CheckDirectory(new DirectoryInfo(@"C:\Users\"), false));
+                tasks.Add(task);
             }
+            Task.WaitAll(tasks.ToArray());
         }
 
         private void CheckDirectory(DirectoryInfo directory, bool usb)
@@ -187,6 +205,7 @@ namespace FoshanVirusKiller
                     //Dispatcher.BeginInvoke(Println, console, e.Message);
                 }
             }
+
             foreach (var file in directory.GetFiles())
             {
 

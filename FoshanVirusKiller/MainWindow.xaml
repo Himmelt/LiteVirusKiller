@@ -12,9 +12,6 @@
         </Grid.RowDefinitions>
         <TextBox x:Name="console" Margin="30,20,30,5" AcceptsReturn="True" TextOptions.TextFormattingMode="Display" ClipToBounds="True" Padding="5" Foreground="#FFB85300" FontFamily="Microsoft YaHei" FontSize="14" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Text="病毒专杀程序&#xA;&#xA;当前版本：1.2.4.1"/>
         <Button x:Name="killer" Content="快 速 查 杀" HorizontalAlignment="Center" Height="40" Margin="0,0,0,15" VerticalAlignment="Bottom" Width="140" Click="OneKeyKill" Grid.Row="1" FontFamily="Microsoft YaHei" FontSize="14" Foreground="#FF0080FF"/>
-        <TextBlock HorizontalAlignment="Right" Height="20" Margin="0,0,10.333,9.667" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Bottom" TextAlignment="Center" Width="{Binding ActualWidth, ElementName=killer, Mode=OneWay}">
-            <Hyperlink Click="OpenHyperlink" NavigateUri="https://github.com/Himmelt/FoshanVirusKiller" ToolTip="前往项目主页">查看项目主页及更新</Hyperlink>
-        </TextBlock>
         <TextBlock x:Name="status" Height="40" Margin="30,0" Grid.Row="1" VerticalAlignment="Top" FontSize="10" TextOptions.TextFormattingMode="Display" TextOptions.TextHintingMode="Animated" Padding="1" TextWrapping="Wrap"/>
         <RadioButton x:Name="checkEntire" Content="全盘扫描" HorizontalAlignment="Left" Margin="109,62.333,0,0" Grid.Row="1" VerticalAlignment="Top" FontSize="12" Checked="OnEntireChecked"/>
         <RadioButton x:Name="checkQuick" Content="快速扫描" HorizontalAlignment="Left" Margin="30,62.333,0,0" Grid.Row="1" VerticalAlignment="Top" FontSize="12" Checked="OnQuickChecked" IsChecked="True"/>
