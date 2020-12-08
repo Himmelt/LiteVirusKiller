@@ -21,6 +21,7 @@ namespace FoshanVirusKiller
     {
         private static DateTime last = DateTime.Now;
         private static bool entire = false;
+        private static bool importOverride = true;
         private static string KEYFOLDER = @"Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced";
 
         private static ConcurrentBag<Task> TASKS = new ConcurrentBag<Task>();
@@ -79,7 +80,7 @@ namespace FoshanVirusKiller
 
         private void loadSettings()
         {
-            Init_Settings();
+            Internal_Settings();
             string path = @"C:\ProgramData\FoshanVirusKiller\virus_info.txt";
             if (File.Exists(path))
             {
@@ -166,6 +167,10 @@ namespace FoshanVirusKiller
             Dispatcher.BeginInvoke(EnableControl, killer, false);
             Dispatcher.BeginInvoke(EnableControl, checkQuick, false);
             Dispatcher.BeginInvoke(EnableControl, checkEntire, false);
+            Dispatcher.BeginInvoke(EnableControl, btnAdd, false);
+            Dispatcher.BeginInvoke(EnableControl, btnRemove, false);
+            Dispatcher.BeginInvoke(EnableControl, btnImport, false);
+
             Dispatcher.BeginInvoke(ClearText, console);
 
             // 检查系统进程
@@ -184,7 +189,9 @@ namespace FoshanVirusKiller
             Dispatcher.BeginInvoke(EnableControl, killer, true);
             Dispatcher.BeginInvoke(EnableControl, checkQuick, true);
             Dispatcher.BeginInvoke(EnableControl, checkEntire, true);
-            //Dispatcher.BeginInvoke(ClearStatus, status);
+            Dispatcher.BeginInvoke(EnableControl, btnAdd, true);
+            Dispatcher.BeginInvoke(EnableControl, btnRemove, true);
+            Dispatcher.BeginInvoke(EnableControl, btnImport, true);
         }
 
         private void KillProcess()
@@ -360,9 +367,10 @@ namespace FoshanVirusKiller
             killer.Content = "全 盘 查 杀";
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void onAddBtnClick(object sender, RoutedEventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog();
+            dialog.Title = "添加病毒样本";
             if (dialog.ShowDialog() == true)
             {
                 Stream file = dialog.OpenFile();
@@ -377,16 +385,109 @@ namespace FoshanVirusKiller
             }
         }
 
-        private void Button_Click_1(object sender, RoutedEventArgs e)
+        private void onRemoveBtnClick(object sender, RoutedEventArgs e)
         {
-            object item = virusList.SelectedItem;
-            if (item != null && item is VirusItem)
+            if (virusList.SelectedItems.Count == 0)
             {
-                VirusItem virusItem = (VirusItem)item;
-                virusInfos.Remove(virusItem.SHA1);
+                MessageBox.Show(this, "请先从样本列表中选中要删除的项！", "操作无效", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
             }
+            foreach (var item in virusList.SelectedItems)
+            {
+                if (item != null && item is VirusItem)
+                {
+                    VirusItem virusItem = (VirusItem)item;
+                    if (virusItem.Keep)
+                    {
+                        MessageBox.Show("内置病毒样本无法删除!", "操作无效", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+                    else
+                    {
+                        virusInfos.Remove(virusItem.SHA1);
+                    }
+                }
+            }
+
             updateVirusList();
             SaveSettings();
+        }
+
+        private void OnImportAddChecked(object sender, RoutedEventArgs e)
+        {
+            importOverride = false;
+        }
+
+        private void OnImportOverrideChecked(object sender, RoutedEventArgs e)
+        {
+            importOverride = true;
+        }
+
+        private void onImportClick(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog dialog = new OpenFileDialog();
+            dialog.Title = "导入病毒库";
+            dialog.Filter = "文本文件|*.txt|全部文件|*.*";
+            if (dialog.ShowDialog() == true)
+            {
+                try
+                {
+                    Stream file = dialog.OpenFile();
+                    StreamReader reader = new StreamReader(file);
+                    if (importOverride)
+                    {
+                        virusInfos.Clear();
+                        Internal_Settings();
+                    }
+                    string line;
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        string[] ss = line.Trim().Split(',');
+                        if (ss.Length >= 3)
+                        {
+                            try
+                            {
+                                long size = Convert.ToInt64(ss[1]);
+                                if (!virusInfos.ContainsKey(ss[0]))
+                                {
+                                    virusInfos.Add(ss[0], new VirusInfo(size, ss[2], false));
+                                }
+                            }
+                            catch (Exception) { }
+                        }
+                    }
+                    file.Close();
+                    reader.Close();
+                }
+                catch (Exception) { }
+
+                updateVirusList();
+                SaveSettings();
+            }
+        }
+
+        private void onExportClick(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog dialog = new SaveFileDialog();
+            dialog.Title = "导出病毒库";
+            dialog.Filter = "文本文件|*.txt|全部文件|*.*";
+            dialog.AddExtension = true;
+            if (dialog.ShowDialog() == true)
+            {
+                try
+                {
+                    Stream file = dialog.OpenFile();
+                    StreamWriter writer = new StreamWriter(file);
+                    foreach (var info in virusInfos)
+                    {
+                        writer.WriteLine(info.Key + ", " + info.Value.size + "," + info.Value.info);
+                    }
+                    writer.Flush();
+                    writer.Close();
+                    file.Close();
+                }
+                catch (Exception) { }
+            }
         }
     }
 }

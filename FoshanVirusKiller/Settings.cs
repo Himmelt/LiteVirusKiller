@@ -24,14 +24,16 @@ namespace FoshanVirusKiller
 
     public class VirusItem
     {
-        public string SHA1;
-        public long Size;
-        public string Info;
-        public bool Keep;
+        public string Key { set; get; }
+        public string SHA1 { set; get; }
+        public long Size { set; get; }
+        public string Info { set; get; }
+        public bool Keep { set; get; }
 
         public VirusItem(string sha1, long size, string info, bool keep)
         {
             this.SHA1 = sha1;
+            this.Key = sha1.Replace("-", "");
             this.Size = size;
             this.Info = info;
             this.Keep = keep;
@@ -45,7 +47,7 @@ namespace FoshanVirusKiller
         private static HashSet<long> SIZES = new HashSet<long>();
         private static HashSet<string> VHASH = new HashSet<string>();
 
-        private static void Init_Settings()
+        private static void Internal_Settings()
         {
             virusInfos.Add("E6-DB-74-2A-81-9E-B5-CC-87-4A-80-6E-AF-A0-EF-06-DB-A7-02-12", new VirusInfo(80235, "winmgr.exe", true));
             virusInfos.Add("F0-EA-23-8D-9C-6C-C8-67-F1-6C-26-48-8F-D2-2E-FC-40-00-71-D0", new VirusInfo(237568, "DeviceConfigManager.exe", true));
