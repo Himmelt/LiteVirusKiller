@@ -10,6 +10,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Collections.Concurrent;
 using System.Reflection;
+using System.Text;
 
 namespace FoshanVirusKiller
 {
@@ -21,27 +22,7 @@ namespace FoshanVirusKiller
         private static DateTime last = DateTime.Now;
         private static bool entire = false;
         private static string KEYFOLDER = @"Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced";
-        private static List<long> SIZES = new List<long> {
-            80235,  // winmgr.exe
-            237568, // DeviceConfigManager
-            480768, // svhost.exe
-            376832, // fold.exe
-            680511, // rundll32.exe
-            32768,  // 感染型木马_system~.ini
-            684607, // folder.exe
-            688703, // folder.exe
-            253952, // sysmwef.exe
-        };
-        private static List<string> VHASH = new List<string>{
-            "E6-DB-74-2A-81-9E-B5-CC-87-4A-80-6E-AF-A0-EF-06-DB-A7-02-12",// winmgr.exe
-            "F0-EA-23-8D-9C-6C-C8-67-F1-6C-26-48-8F-D2-2E-FC-40-00-71-D0",// DeviceConfigManager.exe
-            "ED-02-7B-13-7F-D7-31-04-B3-AD-DD-EF-9E-46-13-0F-03-FB-B6-36",// svhost.exe
-            "1F-6F-E8-49-39-DA-40-51-CE-47-B8-11-30-82-36-65-29-8A-2B-60",// folder.exe
-            "06-29-3D-EA-80-E3-9C-7E-B7-EE-2B-DB-00-D6-0B-58-D9-32-FA-8A",// rundll32.exe
-            "87-D6-FE-33-4D-34-BC-59-A7-FD-C3-92-64-A5-FA-2B-3D-E5-FF-18",// folder.exe
-            "63-40-6D-FB-43-B3-47-88-D5-F3-63-69-92-25-1F-A6-EB-FD-96-B8",// folder.exe
-            "28-95-F4-B3-F3-A2-89-BF-34-40-A5-68-B2-D4-02-19-F7-C9-77-26",// sysmwef.exe
-        };
+
         private static ConcurrentBag<Task> TASKS = new ConcurrentBag<Task>();
         private static SHA1CryptoServiceProvider SHA1 = new SHA1CryptoServiceProvider();
         private static Action<TextBox> ClearText = new Action<TextBox>((textBox) => textBox.Clear());
@@ -90,10 +71,85 @@ namespace FoshanVirusKiller
         {
             InitializeComponent();
             ShowExtension();
-
+            loadSettings();
             var versionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location);
             versionLabel.Content = versionInfo.ProductVersion;
             copyrightLabel.Content = versionInfo.LegalCopyright;
+        }
+
+        private void loadSettings()
+        {
+            Init_Settings();
+            string path = @"C:\ProgramData\FoshanVirusKiller\virus_info.txt";
+            if (File.Exists(path))
+            {
+                try
+                {
+                    string[] lines = File.ReadAllLines(path);
+                    foreach (var line in lines)
+                    {
+                        string[] ss = line.Trim().Split(',');
+                        if (ss.Length >= 3)
+                        {
+                            try
+                            {
+                                long size = Convert.ToInt64(ss[1]);
+                                if (!virusInfos.ContainsKey(ss[0]))
+                                {
+                                    virusInfos.Add(ss[0], new VirusInfo(size, ss[2], false));
+                                }
+                            }
+                            catch (Exception) { }
+                        }
+                    }
+                }
+                catch (Exception) { }
+            }
+            updateVirusList();
+        }
+        private void SaveSettings()
+        {
+            string path = @"C:\ProgramData\FoshanVirusKiller\virus_info.txt";
+            try
+            {
+                Directory.CreateDirectory(@"C:\ProgramData\FoshanVirusKiller\");
+                StreamWriter writer = File.CreateText(path);
+                foreach (var info in virusInfos)
+                {
+                    writer.WriteLine(info.Key + ", " + info.Value.size + "," + info.Value.info);
+                }
+                writer.Flush();
+                writer.Close();
+            }
+            catch (Exception e)
+            {
+                Dispatcher.BeginInvoke(Println, console, e.Message);
+            }
+        }
+        private void updateVirusList()
+        {
+            virusList.Items.Clear();
+            VHASH.Clear();
+            SIZES.Clear();
+            foreach (var info in virusInfos)
+            {
+                VHASH.Add(info.Key);
+                SIZES.Add(info.Value.size);
+                virusList.Items.Add(new VirusItem(info.Key, info.Value.size, info.Value.info, info.Value.keep));
+            }
+        }
+
+        private void StartEverything()
+        {
+            Everything_SetSearchW("size:" + 32768);
+            Everything_SetRequestFlags(EVERYTHING_REQUEST_FULL_PATH_AND_FILE_NAME);
+            Everything_QueryW(true);
+            uint amount = Everything_GetNumResults();
+            for (uint i = 0; i < amount; i++)
+            {
+                StringBuilder builder = new StringBuilder(2048);
+                Everything_GetResultFullPathName(i, builder, 2048);
+            }
         }
 
         private void OneKeyKill(object sender, RoutedEventArgs e)
@@ -302,6 +358,35 @@ namespace FoshanVirusKiller
         {
             entire = true;
             killer.Content = "全 盘 查 杀";
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog dialog = new OpenFileDialog();
+            if (dialog.ShowDialog() == true)
+            {
+                Stream file = dialog.OpenFile();
+                string hash = BitConverter.ToString(SHA1.ComputeHash(file));
+                if (!virusInfos.ContainsKey(hash))
+                {
+                    virusInfos.Add(hash, new VirusInfo(file.Length, dialog.SafeFileName, false));
+                }
+                file.Close();
+                updateVirusList();
+                SaveSettings();
+            }
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            object item = virusList.SelectedItem;
+            if (item != null && item is VirusItem)
+            {
+                VirusItem virusItem = (VirusItem)item;
+                virusInfos.Remove(virusItem.SHA1);
+            }
+            updateVirusList();
+            SaveSettings();
         }
     }
 }

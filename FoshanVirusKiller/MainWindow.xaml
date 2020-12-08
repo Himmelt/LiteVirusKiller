@@ -20,8 +20,27 @@
                     <RadioButton x:Name="checkQuick" Content="快速扫描" HorizontalAlignment="Left" Margin="30,62.333,0,0" Grid.Row="1" VerticalAlignment="Top" FontSize="12" Checked="OnQuickChecked" IsChecked="True"/>
                 </Grid>
             </TabItem>
-            <TabItem Header="" FontSize="13">
-
+            <TabItem Header="病毒库" FontSize="13">
+                <Grid>
+                    <ListView x:Name="virusList" IsSynchronizedWithCurrentItem="True" Margin="10,10,10,100">
+                        <ListView.View>
+                            <GridView>
+                                <GridView.Columns>
+                                    <GridViewColumn Header="SHA1" Width="250" DisplayMemberBinding="{Binding SHA1}"/>
+                                    <GridViewColumn Header="大小 (Byte)" Width="100" DisplayMemberBinding="{Binding Size}"/>
+                                    <GridViewColumn Header="内置" Width="50" DisplayMemberBinding="{Binding Keep}"/>
+                                    <GridViewColumn Header="备注" Width="150" DisplayMemberBinding="{Binding Info}"/>
+                                </GridView.Columns>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                    <Button Content="添加病毒样本" Width="103" Margin="0,0,10,56" Height="24" VerticalAlignment="Bottom" HorizontalAlignment="Right" Background="#FFABFFB2" Click="Button_Click"/>
+                    <Button Content="删除病毒样本" Width="103" Margin="0,0,10,25" Height="24" VerticalAlignment="Bottom" HorizontalAlignment="Right" Background="#FFFF8888" Click="Button_Click_1"/>
+                    <Button Content="导入病毒库" Width="90" Margin="10,0,479,55" Height="24" VerticalAlignment="Bottom" HorizontalAlignment="Left"/>
+                    <Button Content="导出病毒库" Width="90" Margin="10,0,479,25" Height="24" VerticalAlignment="Bottom" HorizontalAlignment="Left"/>
+                    <RadioButton x:Name="importAdd" Content="追加" HorizontalAlignment="Left" Margin="124,0,0,59.4" VerticalAlignment="Bottom" FontSize="12" Checked="OnEntireChecked" IsChecked="True"/>
+                    <RadioButton x:Name="importOverride" Content="覆盖" HorizontalAlignment="Left" Margin="181,0,0,59.4" VerticalAlignment="Bottom" FontSize="12" Checked="OnQuickChecked"/>
+                </Grid>
             </TabItem>
         </TabControl>
         <Grid Margin="0,0,-0.4,0.4" Height="25" VerticalAlignment="Bottom">
