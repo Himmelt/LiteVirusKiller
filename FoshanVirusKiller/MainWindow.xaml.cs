@@ -47,7 +47,7 @@ namespace FoshanVirusKiller
         });
         private static Action<Control, bool> EnableControl = new Action<Control, bool>((control, enable) => control.IsEnabled = enable);
 
-        private void DeleteFile(FileInfo target, bool top)
+        private void DeleteFile(FileInfo target)
         {
             Task task = Task.Factory.StartNew(() =>
             {
@@ -55,14 +55,11 @@ namespace FoshanVirusKiller
                 try
                 {
                     target.Delete();
+                    Dispatcher.BeginInvoke(Println, console, "已删除病毒文件：" + target.FullName);
                 }
                 catch (Exception)
                 {
-                    DeleteFile(target, false);
-                }
-                if (top)
-                {
-                    Dispatcher.BeginInvoke(Println, console, "已删除病毒文件：" + target.FullName);
+                    Dispatcher.BeginInvoke(Println, console, "病毒文件删除失败，请手动删除：" + target.FullName);
                 }
             });
             TASKS.Add(task);
@@ -76,6 +73,12 @@ namespace FoshanVirusKiller
             var versionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location);
             versionLabel.Content = versionInfo.ProductVersion;
             copyrightLabel.Content = versionInfo.LegalCopyright;
+            CallEverythingProcess();
+        }
+
+        private void CallEverythingProcess()
+        {
+            Process.Start("Everything.exe", "-admin -first-instance");
         }
 
         private void loadSettings()
@@ -142,14 +145,38 @@ namespace FoshanVirusKiller
 
         private void StartEverything()
         {
-            Everything_SetSearchW("size:" + 32768);
             Everything_SetRequestFlags(EVERYTHING_REQUEST_FULL_PATH_AND_FILE_NAME);
-            Everything_QueryW(true);
-            uint amount = Everything_GetNumResults();
-            for (uint i = 0; i < amount; i++)
+            foreach (long size in SIZES)
             {
-                StringBuilder builder = new StringBuilder(2048);
-                Everything_GetResultFullPathName(i, builder, 2048);
+                Everything_SetSearchW("size:" + size);
+                Everything_QueryW(true);
+                uint amount = Everything_GetNumResults();
+                for (uint i = 0; i < amount; i++)
+                {
+                    StringBuilder builder = new StringBuilder(2048);
+                    Everything_GetResultFullPathName(i, builder, 2048);
+                    string path = builder.ToString();
+                    if (File.Exists(path))
+                    {
+                        try
+                        {
+                            FileInfo info = new FileInfo(path);
+
+                            FileStream file = info.Open(FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                            string hash = BitConverter.ToString(SHA1.ComputeHash(file));
+                            file.Close();
+
+                            if (VHASH.Contains(hash))
+                            {
+                                DeleteFile(info);
+                            }
+                        }
+                        catch (IOException)
+                        {
+                            Dispatcher.BeginInvoke(Println, console, "文件读取失败: " + path);
+                        }
+                    }
+                }
             }
         }
 
@@ -214,7 +241,7 @@ namespace FoshanVirusKiller
                             {
                                 process.Kill();
                                 Dispatcher.BeginInvoke(Println, console, "结束病毒进程：" + info.Name);
-                                DeleteFile(info, true);
+                                DeleteFile(info);
                             }
                             catch (Exception e)
                             {
@@ -234,11 +261,11 @@ namespace FoshanVirusKiller
 
         private void KillDisks()
         {
-            if (entire) Dispatcher.BeginInvoke(Println, console, "正在全盘检查，文件数量巨大，请耐心等待！");
+            Dispatcher.BeginInvoke(Println, console, "正在全盘检查，请耐心等待！");
             List<Task> tasks = new List<Task>();
             foreach (DriveInfo info in DriveInfo.GetDrives())
             {
-                if (entire || info.DriveType == DriveType.Removable)
+                if (info.DriveType == DriveType.Removable || !"NTFS".Equals(info.DriveFormat))
                 {
                     Task task = Task.Factory.StartNew(() =>
                     {
@@ -249,12 +276,12 @@ namespace FoshanVirusKiller
                     tasks.Add(task);
                 }
             }
-            if (!entire)
+            tasks.Add(Task.Factory.StartNew(() =>
             {
-                Dispatcher.BeginInvoke(Println, console, "正在检查用户文件夹，文件数量较大，请耐心等待！");
-                Task task = Task.Factory.StartNew(() => CheckDirectory(new DirectoryInfo(@"C:\Users\"), false));
-                tasks.Add(task);
-            }
+                Dispatcher.BeginInvoke(Println, console, "正在使用 Everything 快速检查本地 NTFS 磁盘！");
+                StartEverything();
+                Dispatcher.BeginInvoke(Println, console, "Everything 检查完毕！");
+            }));
             Task.WaitAll(tasks.ToArray());
         }
 
@@ -289,7 +316,7 @@ namespace FoshanVirusKiller
                         file.Attributes = FileAttributes.Normal;
                         if (file.Extension.Contains("lnk") || file.Name.Contains("autorun.inf") || file.Name.Contains("DeviceConfigManager.vbs"))
                         {
-                            DeleteFile(file, true);
+                            DeleteFile(file);
                         }
                     }
                     TryKillVirus(file);
@@ -309,7 +336,7 @@ namespace FoshanVirusKiller
                 FileStream file = info.Open(FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 string hash = BitConverter.ToString(SHA1.ComputeHash(file));
                 file.Close();
-                if (VHASH.Contains(hash)) DeleteFile(info, true);
+                if (VHASH.Contains(hash)) DeleteFile(info);
             }
         }
 
@@ -358,13 +385,13 @@ namespace FoshanVirusKiller
         private void OnQuickChecked(object sender, RoutedEventArgs e)
         {
             entire = false;
-            killer.Content = "快 速 查 杀";
+            //killer.Content = "快 速 查 杀";
         }
 
         private void OnEntireChecked(object sender, RoutedEventArgs e)
         {
             entire = true;
-            killer.Content = "全 盘 查 杀";
+            //killer.Content = "全 盘 查 杀";
         }
 
         private void onAddBtnClick(object sender, RoutedEventArgs e)

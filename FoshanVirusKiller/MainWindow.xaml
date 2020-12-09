@@ -14,10 +14,10 @@
                         <RowDefinition Height="115*" MinHeight="110" MaxHeight="110"/>
                     </Grid.RowDefinitions>
                     <TextBox x:Name="console" Margin="30,20,30,5" AcceptsReturn="True" TextOptions.TextFormattingMode="Display" ClipToBounds="True" Padding="5" Foreground="#FFB85300" FontFamily="Microsoft YaHei" FontSize="13" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Text="病毒专杀程序&#xA;&#xA;本程序可对已知的几种特定病毒进行查杀。"/>
-                    <Button x:Name="killer" Content="快 速 查 杀" HorizontalAlignment="Center" Height="40" Margin="230,0,230,21.4" VerticalAlignment="Bottom" Click="OneKeyKill" Grid.Row="1" FontFamily="Microsoft YaHei" FontSize="14" Foreground="#FF0080FF" Width="120"/>
+                    <Button x:Name="killer" Content="全 盘 查 杀" HorizontalAlignment="Center" Height="40" Margin="230,0,230,21.4" VerticalAlignment="Bottom" Click="OneKeyKill" Grid.Row="1" FontFamily="Microsoft YaHei" FontSize="14" Foreground="#FF0080FF" Width="120"/>
                     <TextBlock x:Name="status" Height="40" Margin="30,0" Grid.Row="1" VerticalAlignment="Top" FontSize="10" TextOptions.TextFormattingMode="Display" TextOptions.TextHintingMode="Animated" Padding="1" TextWrapping="Wrap"/>
-                    <RadioButton x:Name="checkEntire" Content="全盘扫描" HorizontalAlignment="Left" Margin="109,62.333,0,0" Grid.Row="1" VerticalAlignment="Top" FontSize="12" Checked="OnEntireChecked"/>
-                    <RadioButton x:Name="checkQuick" Content="快速扫描" HorizontalAlignment="Left" Margin="30,62.333,0,0" Grid.Row="1" VerticalAlignment="Top" FontSize="12" Checked="OnQuickChecked" IsChecked="True"/>
+                    <RadioButton x:Name="checkEntire" Content="全盘扫描" HorizontalAlignment="Left" Margin="109,62.333,0,0" Grid.Row="1" VerticalAlignment="Top" FontSize="12" Checked="OnEntireChecked" Visibility="Hidden"/>
+                    <RadioButton x:Name="checkQuick" Content="快速扫描" HorizontalAlignment="Left" Margin="30,62.333,0,0" Grid.Row="1" VerticalAlignment="Top" FontSize="12" Checked="OnQuickChecked" IsChecked="True" Visibility="Hidden"/>
                 </Grid>
             </TabItem>
             <TabItem Header="病毒样本" FontSize="13">

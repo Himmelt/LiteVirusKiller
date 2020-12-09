@@ -12,8 +12,8 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("SoraWorld")]
 [assembly: AssemblyProduct("FoshanVirusKiller")]
-[assembly: AssemblyCopyright("Copyright © 2017-2021 Himmelt, All Rights Reserved.")]
-[assembly: AssemblyTrademark("Himmelt")]
+[assembly: AssemblyCopyright("Copyright © 2017-2021 WuTong, All Rights Reserved.")]
+[assembly: AssemblyTrademark("WuTong")]
 [assembly: AssemblyCulture("")]
 
 // 将 ComVisible 设置为 false 会使此程序集中的类型
@@ -51,7 +51,7 @@ using System.Windows;
 // 可以指定所有值，也可以使用以下所示的 "*" 预置版本号和修订号
 // 方法是按如下所示使用“*”: :
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.3.0.1")]
-[assembly: AssemblyFileVersion("1.3.0.1")]
+[assembly: AssemblyVersion("1.3.1.0")]
+[assembly: AssemblyFileVersion("1.3.1.0")]
 [assembly: Guid("BF12D8E8-9EDD-4299-BF8A-6F7A49499A2D")]
 
