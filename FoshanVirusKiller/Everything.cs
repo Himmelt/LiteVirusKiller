@@ -122,6 +122,10 @@ namespace FoshanVirusKiller
         public static extern bool Everything_IsFolderResult(UInt32 nIndex);
         [DllImport("Everything64.dll")]
         public static extern bool Everything_IsFileResult(UInt32 nIndex);
+        [DllImport("Everything64.dll")]
+        public static extern bool Everything_IsDBLoaded();
+        [DllImport("Everything64.dll")]
+        public static extern bool Everything_RebuildDB();
         [DllImport("Everything64.dll", CharSet = CharSet.Unicode)]
         public static extern void Everything_GetResultFullPathName(UInt32 nIndex, StringBuilder lpString, UInt32 nMaxCount);
         [DllImport("Everything64.dll")]

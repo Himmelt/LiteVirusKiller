@@ -11,6 +11,7 @@ using System.Windows.Documents;
 using System.Collections.Concurrent;
 using System.Reflection;
 using System.Text;
+using System.ComponentModel;
 
 namespace FoshanVirusKiller
 {
@@ -73,12 +74,40 @@ namespace FoshanVirusKiller
             var versionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location);
             versionLabel.Content = versionInfo.ProductVersion;
             copyrightLabel.Content = versionInfo.LegalCopyright;
-            CallEverythingProcess();
+            Task.Factory.StartNew(() => CallEverythingProcess());
         }
 
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            if (everything != null && !everything.HasExited)
+            {
+                everything.Kill();
+            }
+            //Environment.Exit(0);
+            base.OnClosing(e);
+        }
+        private Process everything;
         private void CallEverythingProcess()
         {
-            Process.Start("Everything.exe", "-admin -first-instance");
+            Dispatcher.BeginInvoke(EnableControl, killer, false);
+
+            everything = new Process();// Process.Start("Everything.exe", "-admin -first-instance");
+            ProcessStartInfo info = new ProcessStartInfo("Everything.exe", "-startup -admin -nodb -first-instance -instance fskiller");
+            info.CreateNoWindow = true;
+            info.WindowStyle = ProcessWindowStyle.Hidden;
+            everything.StartInfo = info;
+            everything.Start();
+            Dispatcher.BeginInvoke(ShowStatus, status, "Everything：正在建立数据索引...");
+            if (Everything_RebuildDB())
+            {
+                Dispatcher.BeginInvoke(Println, console, "\nEverything: 数据索引 建立 完成！");
+            }
+            else
+            {
+                Dispatcher.BeginInvoke(Println, console, "\nEverything: 数据索引 建立 失败！");
+            }
+            Dispatcher.BeginInvoke(ClearStatus, status);
+            Dispatcher.BeginInvoke(EnableControl, killer, true);
         }
 
         private void loadSettings()
@@ -145,6 +174,20 @@ namespace FoshanVirusKiller
 
         private void StartEverything()
         {
+            if (everything.HasExited)
+            {
+                everything.Start();
+                Dispatcher.BeginInvoke(ShowStatus, status, "Everything：正在建立数据索引...");
+                if (Everything_RebuildDB())
+                {
+                    Dispatcher.BeginInvoke(Println, console, "Everything: 数据索引 重建 完成！");
+                }
+                else
+                {
+                    Dispatcher.BeginInvoke(Println, console, "Everything: 数据索引 重建 失败！");
+                }
+                Dispatcher.BeginInvoke(ClearStatus, status);
+            }
             Everything_SetRequestFlags(EVERYTHING_REQUEST_FULL_PATH_AND_FILE_NAME);
             foreach (long size in SIZES)
             {
@@ -229,7 +272,7 @@ namespace FoshanVirusKiller
                 try
                 {
                     FileInfo info = new FileInfo(process.MainModule.FileName);
-                    Dispatcher.BeginInvoke(ShowStatus, status, info.FullName);
+                    Dispatcher.BeginInvoke(ShowStatus, status, "进程：" + info.Name);
                     if (info.Exists && SIZES.Contains(info.Length))
                     {
                         FileStream file = info.Open(FileMode.Open, FileAccess.Read, FileShare.ReadWrite);

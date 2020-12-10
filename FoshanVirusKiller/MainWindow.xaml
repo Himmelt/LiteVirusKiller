@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="FoshanVirusKiller" Width="600" Height="400" MinWidth="600" MinHeight="400" FontFamily="Microsoft YaHei" FontSize="14">
+        Title="FoshanVirusKiller" Width="600" Height="400" MinWidth="600" MinHeight="400" FontFamily="Microsoft YaHei" FontSize="14" WindowStartupLocation="CenterScreen">
     <Grid>
         <TabControl Margin="0" Padding="0">
             <TabItem Header="病毒查杀" FontSize="13">
@@ -13,7 +13,7 @@
                         <RowDefinition Height="256*"/>
                         <RowDefinition Height="115*" MinHeight="110" MaxHeight="110"/>
                     </Grid.RowDefinitions>
-                    <TextBox x:Name="console" Margin="30,20,30,5" AcceptsReturn="True" TextOptions.TextFormattingMode="Display" ClipToBounds="True" Padding="5" Foreground="#FFB85300" FontFamily="Microsoft YaHei" FontSize="13" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Text="病毒专杀程序&#xA;&#xA;本程序可对已知的几种特定病毒进行查杀。"/>
+                    <TextBox x:Name="console" Margin="30,20,30,5" AcceptsReturn="True" TextOptions.TextFormattingMode="Display" ClipToBounds="True" Padding="5" Foreground="#FFB85300" FontFamily="Microsoft YaHei" FontSize="12" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Text="病毒专杀程序&#xA;&#xA;本程序可对已知的几种特定病毒进行查杀。&#xA;"/>
                     <Button x:Name="killer" Content="全 盘 查 杀" HorizontalAlignment="Center" Height="40" Margin="230,0,230,21.4" VerticalAlignment="Bottom" Click="OneKeyKill" Grid.Row="1" FontFamily="Microsoft YaHei" FontSize="14" Foreground="#FF0080FF" Width="120"/>
                     <TextBlock x:Name="status" Height="40" Margin="30,0" Grid.Row="1" VerticalAlignment="Top" FontSize="10" TextOptions.TextFormattingMode="Display" TextOptions.TextHintingMode="Animated" Padding="1" TextWrapping="Wrap"/>
                     <RadioButton x:Name="checkEntire" Content="全盘扫描" HorizontalAlignment="Left" Margin="109,62.333,0,0" Grid.Row="1" VerticalAlignment="Top" FontSize="12" Checked="OnEntireChecked" Visibility="Hidden"/>
