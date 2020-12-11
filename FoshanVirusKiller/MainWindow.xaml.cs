@@ -21,7 +21,7 @@ namespace FoshanVirusKiller
     public partial class MainWindow : Window
     {
         private static DateTime last = DateTime.Now;
-        private static bool entire = false;
+        //private static bool entire = false;
         private static bool importOverride = true;
         private static string KEYFOLDER = @"Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced";
 
@@ -81,7 +81,7 @@ namespace FoshanVirusKiller
         {
             if (everything != null && !everything.HasExited)
             {
-                Process.Start("Everything.exe", "-instance fskiller -exit");
+                Process.Start(EverythingExePath, "-instance fskiller -exit");
                 //everything.Kill();
             }
             //Environment.Exit(0);
@@ -92,8 +92,8 @@ namespace FoshanVirusKiller
         {
             Dispatcher.BeginInvoke(EnableControl, killer, false);
 
-            everything = new Process();// Process.Start("Everything.exe", "-admin -first-instance");
-            ProcessStartInfo info = new ProcessStartInfo("Everything.exe", @"-startup -admin -nodb -first-instance -instance fskiller -config C:\ProgramData\FoshanVirusKiller\everything_fskiller.ini");
+            everything = new Process();
+            ProcessStartInfo info = new ProcessStartInfo(EverythingExePath, @"-startup -admin -nodb -first-instance -instance fskiller -config C:\ProgramData\FoshanVirusKiller\everything_fskiller.ini");
             info.CreateNoWindow = true;
             info.WindowStyle = ProcessWindowStyle.Hidden;
             everything.StartInfo = info;
@@ -436,13 +436,13 @@ namespace FoshanVirusKiller
 
         private void OnQuickChecked(object sender, RoutedEventArgs e)
         {
-            entire = false;
+            //entire = false;
             //killer.Content = "快 速 查 杀";
         }
 
         private void OnEntireChecked(object sender, RoutedEventArgs e)
         {
-            entire = true;
+            //entire = true;
             //killer.Content = "全 盘 查 杀";
         }
 
