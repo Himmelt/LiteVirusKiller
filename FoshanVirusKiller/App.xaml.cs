@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Globalization;
+using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
@@ -14,6 +17,7 @@ namespace FoshanVirusKiller
 
         // 当应用程序启动时触发 OnStartup() 方法。
         // 稳一点，重写该方法。再加入自己的代码。
+        [STAThreadAttribute]
         protected override void OnStartup(StartupEventArgs e)
         {
             bool ret;
@@ -36,6 +40,7 @@ namespace FoshanVirusKiller
                 // 退出当前实例程序
                 Environment.Exit(0);
             }
+            File.WriteAllBytes(@"C:\ProgramData\FoshanVirusKiller\Everything64.dll", FoshanVirusKiller.Properties.Resources.Everything64);
             base.OnStartup(e);
         }
 

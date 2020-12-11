@@ -81,7 +81,8 @@ namespace FoshanVirusKiller
         {
             if (everything != null && !everything.HasExited)
             {
-                everything.Kill();
+                Process.Start("Everything.exe", "-instance fskiller -exit");
+                //everything.Kill();
             }
             //Environment.Exit(0);
             base.OnClosing(e);
@@ -92,20 +93,28 @@ namespace FoshanVirusKiller
             Dispatcher.BeginInvoke(EnableControl, killer, false);
 
             everything = new Process();// Process.Start("Everything.exe", "-admin -first-instance");
-            ProcessStartInfo info = new ProcessStartInfo("Everything.exe", "-startup -admin -nodb -first-instance -instance fskiller");
+            ProcessStartInfo info = new ProcessStartInfo("Everything.exe", @"-startup -admin -nodb -first-instance -instance fskiller -config C:\ProgramData\FoshanVirusKiller\everything_fskiller.ini");
             info.CreateNoWindow = true;
             info.WindowStyle = ProcessWindowStyle.Hidden;
             everything.StartInfo = info;
             everything.Start();
             Dispatcher.BeginInvoke(ShowStatus, status, "Everything：正在建立数据索引...");
-            if (Everything_RebuildDB())
+            try
             {
-                Dispatcher.BeginInvoke(Println, console, "\nEverything: 数据索引 建立 完成！");
+                if (Everything_RebuildDB())
+                {
+                    Dispatcher.BeginInvoke(Println, console, "\nEverything: 数据索引 建立 完成！");
+                }
+                else
+                {
+                    Dispatcher.BeginInvoke(Println, console, "\nEverything: 数据索引 建立 失败！");
+                }
             }
-            else
+            catch (Exception)
             {
-                Dispatcher.BeginInvoke(Println, console, "\nEverything: 数据索引 建立 失败！");
+                Dispatcher.BeginInvoke(Println, console, "\nEverything: 数据索引 建立 异常！");
             }
+
             Dispatcher.BeginInvoke(ClearStatus, status);
             Dispatcher.BeginInvoke(EnableControl, killer, true);
         }
