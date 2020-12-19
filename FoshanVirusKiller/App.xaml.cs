@@ -13,8 +13,6 @@ namespace FoshanVirusKiller
     {
         Mutex mutex;
         const string ProgramDataPath = @"C:\ProgramData\FoshanVirusKiller\";
-        const string EverythingDllPath = @"C:\ProgramData\FoshanVirusKiller\Everything64.dll";
-        const string EverythingExePath = @"C:\ProgramData\FoshanVirusKiller\Everything.exe";
 
         [STAThread]
         protected override void OnStartup(StartupEventArgs e)
@@ -28,8 +26,6 @@ namespace FoshanVirusKiller
                 Environment.Exit(0);
             }
             Directory.CreateDirectory(ProgramDataPath);
-            File.WriteAllBytes(EverythingDllPath, FoshanVirusKiller.Properties.Resources.Everything64);
-            File.WriteAllBytes(EverythingExePath, FoshanVirusKiller.Properties.Resources.Everything);
             base.OnStartup(e);
         }
 

@@ -21,7 +21,6 @@ namespace FoshanVirusKiller
     public partial class MainWindow : Window
     {
         private static DateTime last = DateTime.Now;
-        //private static bool entire = false;
         private static bool importOverride = true;
         private static string KEYFOLDER = @"Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced";
 
@@ -74,51 +73,7 @@ namespace FoshanVirusKiller
             var versionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location);
             versionLabel.Content = versionInfo.ProductVersion;
             copyrightLabel.Content = versionInfo.LegalCopyright;
-            Task.Factory.StartNew(() => CallEverythingProcess());
         }
-
-        protected override void OnClosing(CancelEventArgs e)
-        {
-            if (everything != null && !everything.HasExited)
-            {
-                Process.Start(EverythingExePath, "-instance fskiller -exit");
-                //everything.Kill();
-            }
-            //Environment.Exit(0);
-            base.OnClosing(e);
-        }
-        private Process everything;
-        private void CallEverythingProcess()
-        {
-            Dispatcher.BeginInvoke(EnableControl, killer, false);
-
-            everything = new Process();
-            ProcessStartInfo info = new ProcessStartInfo(EverythingExePath, @"-startup -admin -nodb -first-instance -instance fskiller -config C:\ProgramData\FoshanVirusKiller\everything_fskiller.ini");
-            info.CreateNoWindow = true;
-            info.WindowStyle = ProcessWindowStyle.Hidden;
-            everything.StartInfo = info;
-            everything.Start();
-            Dispatcher.BeginInvoke(ShowStatus, status, "Everything：正在建立数据索引...");
-            try
-            {
-                if (Everything_RebuildDB())
-                {
-                    Dispatcher.BeginInvoke(Println, console, "\nEverything: 数据索引 建立 完成！");
-                }
-                else
-                {
-                    Dispatcher.BeginInvoke(Println, console, "\nEverything: 数据索引 建立 失败！");
-                }
-            }
-            catch (Exception)
-            {
-                Dispatcher.BeginInvoke(Println, console, "\nEverything: 数据索引 建立 异常！");
-            }
-
-            Dispatcher.BeginInvoke(ClearStatus, status);
-            Dispatcher.BeginInvoke(EnableControl, killer, true);
-        }
-
         private void loadSettings()
         {
             Internal_Settings();
@@ -178,57 +133,6 @@ namespace FoshanVirusKiller
                 VHASH.Add(info.Key);
                 SIZES.Add(info.Value.size);
                 virusList.Items.Add(new VirusItem(info.Key, info.Value.size, info.Value.info, info.Value.keep));
-            }
-        }
-
-        private void StartEverything()
-        {
-            if (everything.HasExited)
-            {
-                everything.Start();
-                Dispatcher.BeginInvoke(ShowStatus, status, "Everything：正在建立数据索引...");
-                if (Everything_RebuildDB())
-                {
-                    Dispatcher.BeginInvoke(Println, console, "Everything: 数据索引 重建 完成！");
-                }
-                else
-                {
-                    Dispatcher.BeginInvoke(Println, console, "Everything: 数据索引 重建 失败！");
-                }
-                Dispatcher.BeginInvoke(ClearStatus, status);
-            }
-            Everything_SetRequestFlags(EVERYTHING_REQUEST_FULL_PATH_AND_FILE_NAME);
-            foreach (long size in SIZES)
-            {
-                Everything_SetSearchW("size:" + size);
-                Everything_QueryW(true);
-                uint amount = Everything_GetNumResults();
-                for (uint i = 0; i < amount; i++)
-                {
-                    StringBuilder builder = new StringBuilder(2048);
-                    Everything_GetResultFullPathName(i, builder, 2048);
-                    string path = builder.ToString();
-                    if (File.Exists(path))
-                    {
-                        try
-                        {
-                            FileInfo info = new FileInfo(path);
-
-                            FileStream file = info.Open(FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                            string hash = BitConverter.ToString(SHA1.ComputeHash(file));
-                            file.Close();
-
-                            if (VHASH.Contains(hash))
-                            {
-                                DeleteFile(info);
-                            }
-                        }
-                        catch (IOException)
-                        {
-                            Dispatcher.BeginInvoke(Println, console, "文件读取失败: " + path);
-                        }
-                    }
-                }
             }
         }
 
@@ -317,23 +221,15 @@ namespace FoshanVirusKiller
             List<Task> tasks = new List<Task>();
             foreach (DriveInfo info in DriveInfo.GetDrives())
             {
-                if (info.DriveType == DriveType.Removable || !"NTFS".Equals(info.DriveFormat))
+                info.
+                Task task = Task.Factory.StartNew(() =>
                 {
-                    Task task = Task.Factory.StartNew(() =>
-                    {
-                        Dispatcher.BeginInvoke(Println, console, "正在检查磁盘：" + info.VolumeLabel + " ( " + info.ToString() + " ) ");
-                        CheckDirectory(info.RootDirectory, info.DriveType == DriveType.Removable);
-                        Dispatcher.BeginInvoke(Println, console, "磁盘：" + info.VolumeLabel + " ( " + info.ToString() + " ) 检查完毕！");
-                    });
-                    tasks.Add(task);
-                }
+                    Dispatcher.BeginInvoke(Println, console, "正在检查磁盘：" + info.VolumeLabel + " ( " + info.ToString() + " ) ");
+                    CheckDirectory(info.RootDirectory, info.DriveType == DriveType.Removable);
+                    Dispatcher.BeginInvoke(Println, console, "磁盘：" + info.VolumeLabel + " ( " + info.ToString() + " ) 检查完毕！");
+                });
+                tasks.Add(task);
             }
-            tasks.Add(Task.Factory.StartNew(() =>
-            {
-                Dispatcher.BeginInvoke(Println, console, "正在使用 Everything 快速检查本地 NTFS 磁盘！");
-                StartEverything();
-                Dispatcher.BeginInvoke(Println, console, "Everything 检查完毕！");
-            }));
             Task.WaitAll(tasks.ToArray());
         }
 
